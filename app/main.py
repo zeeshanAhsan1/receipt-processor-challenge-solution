@@ -10,6 +10,9 @@ app = FastAPI(
   vesrion="1.0.0",
 )
 
+# In-Memory Store for receipts -> use a dictionary/map with Uid as key & receipt as value
+receipt_store: Dict[str, dict] = {}
+
 # Define Data Classes
 class Item(BaseModel):
   shortDescription: str = Field(..., example="Mountain Dew 12PK")
@@ -64,6 +67,11 @@ def processReceipt(receipt: Receipt):
 
   # Generate a Unique Id
   receipt_id = str(uuid.uuid4())
+
+  # Store generated receipt in memory
+  receipt_store[receipt_id] = receipt.dict()
+
+  print(receipt_store)
 
   # Return response
   return {"id": receipt_id}
