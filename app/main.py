@@ -75,3 +75,22 @@ def processReceipt(receipt: Receipt):
 
   # Return response
   return {"id": receipt_id}
+
+@app.get(
+  "/receipts/{id}/points",
+  summary="Get points for a receipt",
+  description="Looks up the receipt by ID and returns the number of points awarded.",
+  status_code=status.HTTP_200_OK,
+  )
+def getPoints(id: str):
+  try:
+    receipt = receipt_store.get(id)
+    if not receipt:
+      raise ValueError("Invalid retailer name")
+  except ValueError as e:
+    raise HTTPException(
+      status_code=status.HTTP_404_NOT_FOUND,
+      detail="Receipt not found with Id: " + id,
+    )
+  points = 0
+  return {"points": points}
