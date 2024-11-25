@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Dict
 import uuid
@@ -32,9 +32,35 @@ class ReceiptResponse(BaseModel):
           summary="Submits a receipt for processing",
           description="Submits a receipt for processing",
           status_code=status.HTTP_200_OK,
+          responses={
+        400: {
+            "description": "The receipt is invalid",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "detail": {"type": "string", "example": "Invalid receipt data"}
+                        },
+                    }
+                }
+            },
+        }
+    }
           )
 def processReceipt(receipt: Receipt):
 
+  # Basic validation -> If the retailer name doesn't have alpha-numeric characters -> throw Ex -> Send 400
+  try:
+    retailer_name = receipt.retailer
+    for char in retailer_name:
+      if not char.isalnum():
+        raise ValueError("Invalid retailer name")
+  except ValueError as e:
+    raise HTTPException(
+      status_code=status.HTTP_400_BAD_REQUEST,
+      detail="Invalid request data: " + str(e),
+    )
 
   # Generate a Unique Id
   receipt_id = str(uuid.uuid4())
