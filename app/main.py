@@ -30,6 +30,9 @@ class Receipt(BaseModel):
 class ReceiptResponse(BaseModel):
   id: str = Field(..., example="adb6b560-0eef-42bc-9d16-df48f30e89b2")
 
+class PointsResponse(BaseModel):
+    points: int = Field(..., example=32)
+
 
 # Endpoints
 @app.post("/receipts/process",
@@ -85,6 +88,7 @@ def processReceipt(receipt: Receipt):
 
 @app.get(
   "/receipts/{id}/points",
+  response_model=PointsResponse,
   summary="Get points for a receipt",
   description="Looks up the receipt by ID and returns the number of points awarded.",
   status_code=status.HTTP_200_OK,
